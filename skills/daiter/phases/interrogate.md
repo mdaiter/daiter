@@ -49,19 +49,41 @@ Ask questions in tier order, starting broad and drilling down:
 
 Ask 3-5 questions at a time, wait for answers, then drill deeper if needed. Don't overwhelm with too many questions at once.
 
+### Question Presentation Format
+
+Use the `AskUserQuestion` tool for questions that have clear discrete options (2-4 choices). Use prose for genuinely open-ended questions where any answer is valid.
+
+**Use AskUserQuestion when:**
+- The question has 2-4 meaningful discrete options (e.g., deployment target, data model shape, rendering approach)
+- The choice has clear architectural implications
+- You can write a useful 1-line description for each option
+
+**Use prose when:**
+- The answer is free-form (e.g., "describe your performance requirements")
+- There are more than 4 viable options and collapsing them would lose nuance
+- The question is really asking for a number, name, or description
+
+**Batching:** Group up to 4 questions into a single `AskUserQuestion` call. This presents all questions at once instead of sequentially, which is faster and feels more like a form than a conversation.
+
+**Example** — the deployment target question from the example above would be:
+```
+AskUserQuestion:
+  question: "Deployment target?"
+  header: "Deploy target"
+  options:
+    - label: "Headless Linux (SSH)"
+      description: "No display — axum+browser over SSH port-forward"
+    - label: "Local with display"
+      description: "egui native window, direct rendering"
+    - label: "Both"
+      description: "Support both modes with a runtime flag"
+```
+
 ### Step 3.5: Proactive Questions — "Questions You Should Have Asked"
 
 After the standard clarification questions, step back from what was explicitly requested. Based on the domain, the codebase, and common patterns for this type of feature, surface things the user didn't think to ask.
 
-Generate 2-4 proactive questions about concerns NOT already in the plan:
-
-```
-Now, stepping back from what was explicitly requested — based on the domain,
-the codebase, and common patterns for this type of feature:
-
-1. [Proactive question about something not in the plan]
-2. [Proactive question about something not in the plan]
-```
+Generate 2-4 proactive questions about concerns NOT already in the plan. Where the question has clear options, use `AskUserQuestion` (batch with Step 3 questions if possible — up to 4 total per call). Where it's open-ended, use prose.
 
 **Skill-level adaptation for question framing:**
 - **novice**: "Most apps that have [feature] also include [X]. Do you want that too?" (educational — they learn what's normal)
