@@ -70,6 +70,8 @@ If the user says "blaze", set `auto_advance = true` for the remainder of this pi
 
 Execute phases in this order: **plan → interrogate → scaffold → implement → test → review → push → coach**
 
+**Interrogate is mandatory.** It always runs in full-pipeline mode — regardless of skill level, `auto_advance`, or how complete the plan looks. The plan phase produces a draft; interrogate is where it gets pressure-tested. Never skip from plan directly to scaffold or implement.
+
 Between each phase:
 
 - If `auto_advance = false`:
@@ -78,6 +80,7 @@ Between each phase:
   - Ask: "Continue to [next phase]? (or: 'blaze' to auto-advance, 'stop' to pause here)"
 - If `auto_advance = true`:
   - Run continuously, pause only on: errors, decision points requiring user input, failed tests, critical review findings
+  - **Exception**: always pause before interrogate to confirm the plan before drilling into questions
 
 #### 4. Feature Description Passthrough
 

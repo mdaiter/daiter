@@ -92,13 +92,9 @@ After each round, assess whether the plan is sufficiently clear to proceed:
 - **Needs more**: Still have open questions or ambiguities → continue questioning
 - **Scope change**: Answers revealed the scope is different than planned → suggest re-planning with `/daiter plan`
 
-### Step 6: Skip Warning
+### Step 6: Skip Handling
 
-If the user runs `/daiter scaffold` without having run `/daiter interrogate`, display a brief warning:
-
-> Interrogation phase was skipped. This may lead to implementation gaps if requirements aren't fully understood. Consider running `/daiter interrogate` first, or proceed if you're confident the plan is complete.
-
-This is a warning only — don't block the scaffold phase.
+If the user runs `/daiter scaffold` directly without having run `/daiter interrogate`, **stop and run interrogate first** before proceeding to scaffold. Interrogate is a mandatory gate in the pipeline — the only exception is if the user explicitly overrides ("I want to skip interrogate"). In that case, acknowledge the trade-off and proceed.
 
 ## Question Quality Guidelines
 

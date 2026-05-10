@@ -105,10 +105,9 @@ Save the plan to `.daiter/plans/<timestamp>-<slugified-title>.md` where:
 
 ### Step 5: Suggest Next Steps
 
-Tell the user:
-- If there are open questions: suggest `/daiter interrogate` to refine
-- If the plan is clear: suggest `/daiter scaffold` to generate stubs
-- Remind them they can edit the plan file directly
+Always suggest `/daiter interrogate` next — even if the plan seems complete. Interrogate catches edge cases, unstated assumptions, and domain-relevant concerns that planning alone misses. Do not suggest skipping to scaffold.
+
+Remind the user they can edit the plan file directly before interrogating.
 
 ## Context Awareness
 
