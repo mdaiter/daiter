@@ -110,9 +110,36 @@ After each round of answers:
 
 After each round, assess whether the plan is sufficiently clear to proceed:
 
-- **Ready**: All open questions resolved, edge cases identified, approach is unambiguous → suggest `/daiter scaffold`
 - **Needs more**: Still have open questions or ambiguities → continue questioning
 - **Scope change**: Answers revealed the scope is different than planned → suggest re-planning with `/daiter plan`
+- **Ready**: All open questions resolved, edge cases identified, approach is unambiguous → proceed to Step 5.5
+
+### Step 5.5: Plan Review Gate
+
+Before handing off to scaffold, always present the full updated plan for explicit confirmation. The interrogate phase changes the plan — scaffold should only run against a plan the user has seen and approved post-interrogation.
+
+1. Write all decisions captured during interrogation into the plan file (if not already done in Step 4)
+2. Present a **diff summary**: what changed from the original plan — new decisions, resolved questions, scope adjustments, added risks
+3. Show the full updated plan (or a structured summary for expert/master)
+4. Ask for confirmation before proceeding:
+
+```
+The plan has been updated with your answers. Here's what changed:
+- [Decision 1]: [what was decided and why]
+- [Decision 2]: [what was decided and why]
+- [Scope addition]: [anything added]
+
+[Full plan or summary]
+
+Ready to scaffold from this plan? (or: 'revise' to adjust, 'replan' to go back to plan phase)
+```
+
+**Skill-level adaptation:**
+- **novice/apprentice**: Show the full updated plan with plain-language summary of what each decision means for the implementation
+- **practitioner**: Show updated Design Decisions and Affected Modules sections; summarize other changes
+- **expert/master**: Show the diff summary only — decisions made and anything that changed scope. Full plan on request.
+
+This gate is not skippable in full-pipeline mode. In `auto_advance` mode, still pause here — the user must confirm the plan before architecture is committed.
 
 ### Step 6: Skip Handling
 

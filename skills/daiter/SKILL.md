@@ -72,6 +72,8 @@ Execute phases in this order: **plan → interrogate → scaffold → implement 
 
 **Interrogate is mandatory.** It always runs in full-pipeline mode — regardless of skill level, `auto_advance`, or how complete the plan looks. The plan phase produces a draft; interrogate is where it gets pressure-tested. Never skip from plan directly to scaffold or implement.
 
+**Plan review gate is mandatory.** At the end of interrogate (Step 5.5), the updated plan is always shown and confirmed before scaffold runs. Scaffold must never run against an unreviewed post-interrogation plan.
+
 Between each phase:
 
 - If `auto_advance = false`:
