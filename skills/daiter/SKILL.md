@@ -108,9 +108,9 @@ Before dispatching to any phase, also:
 
 ### Actor System
 
-Actors are specialist reviewers that participate in specific phases. The actor system is defined in `actors/_actor-system.md`. Individual actors are in `actors/<name>.md`.
+Actors are specialist reviewers launched as parallel Task subagents during review phases. The actor system is defined in `actors/_actor-system.md`. Individual actors are in `actors/<name>.md`.
 
-Actors are loaded on-demand — only read actor files when a phase requires actor participation.
+Actors are NOT in-session personas — each is a separate Task call. During review, they run in two parallel waves (Architect first, all others simultaneously in Wave 2), with the Wiki Actor running last. See `actors/_actor-system.md` for the full execution model and context package spec.
 
 ### Agent System
 

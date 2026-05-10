@@ -2,28 +2,54 @@
 
 ## What Are Actors?
 
-Actors are specialist personas that Claude adopts during specific workflow phases. Each actor brings domain expertise, a specific review lens, and writes findings into the wiki/context file system.
+Actors are specialist reviewers launched as parallel Task subagents during review phases. Each actor receives a bounded context package, runs its review protocol independently, and returns structured findings. The orchestrating phase synthesizes all findings into a report.
 
-Actors are NOT separate processes or API calls — they are prompt-driven personas that Claude switches between within a single session.
+Actors are NOT in-session personas — they are separate Task calls with their own context window, running concurrently.
+
+## Execution Model
+
+### Two-Wave Parallel Execution
+
+Actors run in two waves during `/daiter review`:
+
+**Wave 1 — Architect (solo)**
+Spawn a single Task for the Architect actor. It runs first because its structural findings (coupling, module boundaries, design smells) give all other actors a frame of reference. Wait for it to complete before launching Wave 2.
+
+**Wave 2 — All other actors (parallel)**
+Spawn all remaining enabled actors as parallel Tasks in a single batch. Each Task receives the architect's findings as additional context. All run simultaneously — do not wait for one before launching the next.
+
+**Wave 3 — Wiki Actor (sequential, after all findings)**
+The Wiki Actor runs last, after all other findings are collected. It needs the full picture to update CONTEXT.md files accurately.
+
+### Context Package
+
+Each actor Task receives:
+1. The actor's definition file (its role, expertise, review protocol, output format)
+2. The diff of all changed files (or full file content if git unavailable)
+3. The current plan from `.daiter/plans/`
+4. CONTEXT.md files for all affected modules
+5. `[user].skill_level` and `[user].feedback_mode` from config
+6. **Wave 2 only**: The Architect's findings
+
+Each actor Task returns its findings as structured markdown. The orchestrating session writes these to the appropriate CONTEXT.md files and synthesizes them into the review report.
+
+### Model Selection
+
+- **Architect (Wave 1)**: Sonnet — needs reasoning depth for structural analysis
+- **Wave 2 actors**: Sonnet — domain expertise, pattern recognition
+- **Wiki Actor (Wave 3)**: Haiku — mechanical update of CONTEXT.md files from findings
 
 ## Actor Lifecycle
 
-### Activation
-
-Actors are activated when a phase requires their expertise. Each phase file specifies which actors participate. The workflow engine:
-
-1. Reads `.daiter/config.toml` to get the list of `[actors].enabled`
-2. For each actor required by the current phase, reads the actor's definition file
-3. Claude adopts the actor's persona, reviews the relevant code/plan, and produces findings
-4. Findings are written to the appropriate CONTEXT.md files and/or review reports
-
 ### Phase Participation
 
-Each actor definition specifies which phases it participates in. Actors are only loaded when their phase is active — this saves tokens.
+Each actor definition specifies which phases it participates in. In non-review phases (scaffold, implement, test), actors that participate are still spawned as Tasks — not adopted as in-session personas.
 
 ### Self-Assessment Protocol
 
-Every `[workflow].actor_reassess_interval` cycles (default: 5), actors self-assess during the `/daiter review` phase. The self-assessment follows this protocol:
+Every `[workflow].actor_reassess_interval` cycles (default: 5), actors self-assess. Self-assessment Tasks run in parallel with Wave 2 during `/daiter review`.
+
+Each self-assessment Task receives: the actor's definition, findings from the last N review cycles (from review reports in `.daiter/reviews/`), and the current config.
 
 #### 1. Relevance Check
 ```
@@ -43,12 +69,7 @@ As [Actor Name], review how the codebase has changed since your last assessment.
 - Should your focus areas be updated?
 ```
 
-**If scope has shifted**: Update the actor's focus areas in config. For example:
-```toml
-[actors.language-specialist]
-language = "rust"
-focus = ["async patterns", "error handling"]  # was: ["ownership", "lifetimes"]
-```
+**If scope has shifted**: Update the actor's focus areas in config.
 
 #### 3. Spawn Check
 ```
@@ -113,9 +134,7 @@ What metrics indicate this actor is still providing value.
 
 ## Skill-Level Aware Output
 
-This adaptation is the actor's responsibility during output generation — actors read `[user].skill_level` from config before writing findings. The review phase does NOT translate actor output; it presents it as-is. Therefore every actor must follow these guidelines when producing findings.
-
-When writing findings, actors must read `[user].skill_level` from `.daiter/config.toml` and adapt their language:
+This adaptation is the actor's responsibility during output generation — actors read `[user].skill_level` from the context package before writing findings. The review phase does NOT translate actor output; it presents it as-is. Therefore every actor must follow these guidelines when producing findings.
 
 - **novice/apprentice**: Explain the finding in plain language. Explain WHY it matters. Use "because" liberally. Example: "This function takes user input and puts it directly into a database query. This is dangerous because an attacker could type special characters that trick the database into revealing or deleting data (this is called 'SQL injection')."
 
@@ -125,17 +144,6 @@ When writing findings, actors must read `[user].skill_level` from `.daiter/confi
 
 When `[user].feedback_mode = "off"`, actors report findings without any explanation — just the finding and the fix. When `feedback_mode = "passive"`, actors report findings with brief rationale but don't teach concepts.
 
-## Loading Actors
-
-When a phase requires actors:
-
-1. Read `.daiter/config.toml` to get enabled actors
-2. For each required actor, check if a custom version exists at `.daiter/actors/<name>.md`
-3. If no custom version, use the default from `actors/<name>.md` in the skill bundle
-4. Apply any config overrides (focus areas, language, framework)
-5. Execute the actor's review protocol
-6. Write findings to appropriate locations
-
 ## Custom Actors
 
 Users can create custom actors by:
@@ -143,4 +151,4 @@ Users can create custom actors by:
 2. Manually creating `.daiter/actors/<name>.md` following the template
 3. Adding the actor name to `[actors].custom` in config
 
-Custom actors follow the same lifecycle as default actors.
+Custom actors follow the same lifecycle as default actors and run in Wave 2 alongside built-in actors.

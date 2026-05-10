@@ -17,26 +17,38 @@ Perform standard context load (see SKILL.md). Additionally:
 
 ### Step 2: Run Actor Reviews
 
-For each enabled actor that participates in the review phase, load their definition from `actors/<name>.md` and execute their review protocol.
+Actors run as parallel Task subagents in two waves. See `actors/_actor-system.md` for the full execution model.
 
-**Review order** (to allow later actors to build on earlier findings):
+#### Wave 1 — Architect (single Task, Sonnet)
 
-1. **Architect** — Structural review first, sets the frame
-2. **Security Auditor** — Security review while architecture is fresh
-3. **Language Specialist** — Idiomatic code review
-4. **Framework Specialist** — Framework alignment review
-5. **Performance Critic** — Performance review
-6. **Dependency Reviewer** — Dependency changes review (only if dependency files changed)
-7. **Wiki Actor** — Updates context files with all findings
-8. **Custom actors** — Any user-defined or discovered actors
+Spawn one Task for the Architect with this context package:
+- `actors/architect.md` (or `.daiter/actors/architect.md` if custom)
+- Full diff of changed files
+- Current plan from `.daiter/plans/`
+- CONTEXT.md files for all affected modules
+- `[user].skill_level` and `[user].feedback_mode`
 
-For each actor:
-1. Read the actor's definition file
-2. Adopt the actor's persona
-3. Review all changed files through the actor's lens
-4. Write findings to the appropriate CONTEXT.md files under `## Actor Notes > ### <Actor Name>`
-5. For system-level findings, write to root CONTEXT.md
-6. For cross-cutting findings, write to `.daiter/cross-cutting.md`
+Wait for Architect findings before launching Wave 2.
+
+#### Wave 2 — All other actors (parallel Tasks, Sonnet)
+
+Spawn all remaining enabled actors simultaneously as parallel Tasks. Each Task receives the same context package as Wave 1 **plus** the Architect's findings. Do not wait for one actor before launching the next — launch all at once.
+
+Standard Wave 2 actors:
+- Security Auditor
+- Language Specialist
+- Framework Specialist
+- Performance Critic
+- Dependency Reviewer (only if dependency files changed)
+- Any custom actors
+
+If self-assessment is due (check against `[workflow].actor_reassess_interval`), run each actor's self-assessment Task in parallel with Wave 2 as well.
+
+Wait for all Wave 2 Tasks to complete before proceeding.
+
+#### Wave 3 — Wiki Actor (single Task, Haiku)
+
+Spawn one Task for the Wiki Actor with the full set of findings from Waves 1 and 2. It updates CONTEXT.md files and `.daiter/cross-cutting.md`. Haiku is sufficient — this is mechanical writing from structured input.
 
 ### Step 3: Generate Review Report
 
