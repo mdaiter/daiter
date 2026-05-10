@@ -6,20 +6,22 @@ A structured, multi-phase development workflow that works with any language and 
 
 **Quickest:** just tell Claude to install it.
 
-> "Install the daiter skill from `~/Code/personal_work_scaffolding` to my global Claude skills"
+> "Install the daiter skill from `git@github.com:mdaiter/daiter.git` to my global Claude skills"
 
-Claude will copy `skills/daiter/` to `~/.claude/skills/daiter/` and it'll be available in every project.
+Claude will clone the repo and copy `skills/daiter/` to `~/.claude/skills/daiter/` so it's available in every project.
 
 ### Or install it yourself
 
 **Global (available in all your projects):**
 ```bash
-cp -r skills/daiter ~/.claude/skills/daiter
+git clone git@github.com:mdaiter/daiter.git /tmp/daiter
+cp -r /tmp/daiter/skills/daiter ~/.claude/skills/daiter
 ```
 
 **Per-project (this repo only):**
 ```bash
-cp -r skills/daiter /path/to/your/repo/.claude/skills/daiter
+git clone git@github.com:mdaiter/daiter.git /tmp/daiter
+cp -r /tmp/daiter/skills/daiter /path/to/your/repo/.claude/skills/daiter
 ```
 
 Then open Claude Code and run `/daiter`.
