@@ -1,0 +1,32 @@
+{
+  "hooks": [
+    {
+      "matcher": {
+        "event": "on_tool_response",
+        "tool_name": "Write"
+      },
+      "hooks": [
+        {
+          "type": "command",
+          "command": "echo 'daiter: source file written, CONTEXT.md may need update'",
+          "description": "Reminder to update wiki context files after source changes",
+          "timeout": 5000
+        }
+      ]
+    },
+    {
+      "matcher": {
+        "event": "on_tool_response",
+        "tool_name": "Edit"
+      },
+      "hooks": [
+        {
+          "type": "command",
+          "command": "echo 'daiter: source file edited, CONTEXT.md may need update'",
+          "description": "Reminder to update wiki context files after source changes",
+          "timeout": 5000
+        }
+      ]
+    }
+  ]
+}
