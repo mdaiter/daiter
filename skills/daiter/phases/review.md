@@ -13,6 +13,7 @@ Perform standard context load (see SKILL.md). Additionally:
 1. Identify all files changed in this workflow cycle:
    - If git is available, use `git diff` to find changed files
    - Otherwise, compare against the plan's affected modules list
+2. If 3+ modules are affected, spawn parallel explore agents on Haiku to load their CONTEXT.md files simultaneously before proceeding to actor reviews
 
 ### Step 2: Run Actor Reviews
 

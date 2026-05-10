@@ -11,7 +11,7 @@ When the user runs `/daiter implement`, execute the following:
 
 Perform standard context load (see SKILL.md). Additionally:
 1. Read implementation notes from `.daiter/impl-notes/` if they exist
-2. Scan for remaining stubs:
+2. Scan for remaining stubs using parallel explore agents on Haiku (one per module or directory) if the project has 3+ affected modules:
    - Rust: `todo!()` macros
    - TypeScript: `throw new Error("Not implemented")`
    - Python: `raise NotImplementedError`

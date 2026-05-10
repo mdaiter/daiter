@@ -93,7 +93,7 @@ Every phase begins with these steps (individual phases reference this as "standa
 
 1. Read `.daiter/config.toml` (including `[user]` settings for skill level and feedback mode)
 2. Read the most recent plan from `.daiter/plans/` (if any)
-3. Read CONTEXT.md files for modules relevant to the current task
+3. Read CONTEXT.md files for modules relevant to the current task — if there are 3+ modules, spawn parallel explore agents on Haiku (see `agents/explore.md`) rather than reading sequentially
 4. Check `.daiter/tools/registry.json` for available tooling
 
 Before dispatching to any phase, also:
@@ -106,6 +106,18 @@ Before dispatching to any phase, also:
 Actors are specialist reviewers that participate in specific phases. The actor system is defined in `actors/_actor-system.md`. Individual actors are in `actors/<name>.md`.
 
 Actors are loaded on-demand — only read actor files when a phase requires actor participation.
+
+### Agent System
+
+Agents are utility workers spawned for bounded, parallelizable tasks. The standard agents are in `agents/`.
+
+| Agent | File | Use |
+|-------|------|-----|
+| Explore | `agents/explore.md` | Parallel codebase exploration on Haiku |
+
+**When to spawn explore agents**: Any time a phase needs to read from 3+ independent locations (modules, files, directories). Spawn them all at once in a single parallel batch on Haiku, synthesize results, then proceed. Do not read sequentially when parallel is possible.
+
+See `agents/explore.md` for the full invocation pattern and output format.
 
 ### Error Handling
 

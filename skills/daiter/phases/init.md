@@ -9,7 +9,13 @@ When the user runs `/daiter init`, execute the following steps in order:
 
 ### Step 1: Project Detection
 
-Scan the repository to detect:
+Spawn parallel explore agents on Haiku (see `agents/explore.md`) to scan the repository simultaneously:
+
+- Agent 1: Look for language indicator files (`Cargo.toml`, `package.json`, `go.mod`, etc.)
+- Agent 2: Look for framework indicators (`next.config.*`, `angular.json`, `vite.config.*`, etc.)
+- Agent 3: Check for monorepo/workspace signals (multiple project files, Lerna/Nx/Turborepo config)
+
+Synthesize agent findings, then detect:
 
 1. **Languages**: Look for language-specific files:
    - `Cargo.toml` → Rust

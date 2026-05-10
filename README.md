@@ -76,6 +76,14 @@ It then adjusts vocabulary, pacing, teaching depth, and coaching accordingly. If
 
 ---
 
+## Agents
+
+Daiter uses a lightweight **explore agent** for parallel codebase exploration. Whenever a phase needs to read from multiple locations (3+ modules, directories, or files), it spawns a batch of explore agents simultaneously on Haiku rather than reading sequentially. Results are synthesized before the phase proceeds.
+
+This keeps exploration fast and cheap — Haiku handles reads and pattern matching, the main session handles reasoning.
+
+---
+
 ## Actor System
 
 Specialist reviewers that participate in specific phases:
@@ -158,6 +166,7 @@ Copy `hooks/hooks.json` to `.claude/hooks/daiter-hooks.json` for automatic wiki 
 ├── SKILL.md
 ├── phases/
 ├── actors/
+├── agents/                  # ← utility agents (explore on Haiku)
 └── reference/
 
 your-repo/
